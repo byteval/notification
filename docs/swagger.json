@@ -1,0 +1,153 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "API сервиса уведомлений",
+        "title": "Notification Service API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/notifications": {
+            "post": {
+                "description": "Создает новое уведомление",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Создать уведомление",
+                "parameters": [
+                    {
+                        "description": "Данные уведомления",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/create.Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/create.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/notifications/{id}": {
+            "get": {
+                "description": "Возвращает уведомление по ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Получить уведомление",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID уведомления",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/get.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "create.Request": {
+            "description": "Модель запроса для создания уведомления",
+            "type": "object",
+            "required": [
+                "channel",
+                "message",
+                "recipient",
+                "subject"
+            ],
+            "properties": {
+                "channel": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string",
+                    "maxLength": 1000
+                },
+                "recipient": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "subject": {
+                    "type": "string",
+                    "maxLength": 100
+                }
+            }
+        },
+        "create.Response": {
+            "description": "Стандартный ответ API",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "recipient": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "get.Response": {
+            "type": "object",
+            "properties": {
+                "channel": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "recipient": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

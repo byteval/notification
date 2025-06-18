@@ -1,0 +1,103 @@
+basePath: /api/v1
+definitions:
+  create.Request:
+    description: Модель запроса для создания уведомления
+    properties:
+      channel:
+        type: string
+      message:
+        maxLength: 1000
+        type: string
+      recipient:
+        maxLength: 255
+        type: string
+      subject:
+        maxLength: 100
+        type: string
+    required:
+    - channel
+    - message
+    - recipient
+    - subject
+    type: object
+  create.Response:
+    description: Стандартный ответ API
+    properties:
+      id:
+        type: string
+      recipient:
+        type: string
+      status:
+        type: string
+    type: object
+  get.Response:
+    properties:
+      channel:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      message:
+        type: string
+      recipient:
+        type: string
+      status:
+        type: string
+      subject:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API сервиса уведомлений
+  title: Notification Service API
+  version: "1.0"
+paths:
+  /notifications:
+    post:
+      consumes:
+      - application/json
+      description: Создает новое уведомление
+      parameters:
+      - description: Данные уведомления
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/create.Request'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/create.Response'
+      summary: Создать уведомление
+      tags:
+      - Notifications
+  /notifications/{id}:
+    get:
+      description: Возвращает уведомление по ID
+      parameters:
+      - description: ID уведомления
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/get.Response'
+      summary: Получить уведомление
+      tags:
+      - Notifications
+schemes:
+- http
+- https
+swagger: "2.0"
