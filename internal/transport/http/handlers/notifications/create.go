@@ -22,14 +22,15 @@ func NewCreateNotificationHandler(creator *createUseCase.Creator, log logger.Log
 	return handler.CreateNotification
 }
 
-// CreateNotification обрабатывает POST /notifications
-// @Summary Создать уведомление
+// @Summary Создание уведомления
 // @Description Создает новое уведомление
 // @Tags Notifications
-// @Accept json
-// @Produce json
+// @Accept  json
+// @Produce  json
 // @Param input body createUseCase.Request true "Данные уведомления"
 // @Success 201 {object} createUseCase.Response
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
 // @Router /notifications [post]
 func (h *CreateNotificationHandler) CreateNotification(c *gin.Context) {
 	var req createUseCase.Request

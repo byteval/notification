@@ -82,10 +82,8 @@ notification/
 │    │   │   └── layout_repository.go   
 │    │   └── notifiers/                 # Реализации сервисов
 │    │       ├── smtp/                  # Сервис отправки почты по SMTP
-│    │       │   ├── client.go
 │    │       │   └── notifier.go
 │    │       └── webhook/               # Сервис отправки webhook
-│    │           ├── client.go
 │    │           └── notifier.go
 ├── pkg/                                # Дополнительные пакеты
 │    └── logger 

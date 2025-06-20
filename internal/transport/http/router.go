@@ -2,30 +2,25 @@ package http
 
 import (
 	"notification/internal/container"
+	layoutHandlers "notification/internal/transport/http/handlers/layouts"
 	handlers "notification/internal/transport/http/handlers/notifications"
 	"notification/internal/transport/http/middleware"
 
 	"github.com/gin-gonic/gin"
 
-	//_ "notification/docs"
+	_ "notification/docs"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-// @title Notification Service API
-// @version 1.0
-// @description API сервиса уведомлений
-// @host localhost:8080
-// @BasePath /api/v1
-// @schemes http https
-func SetupRouter(cnt *container.Container) *gin.Engine {
+func SetupRouter(ctn *container.Container) *gin.Engine {
 	router := gin.Default()
 
 	// Глобальные middleware
 	router.Use(
-		middleware.Logging(cnt.Logger),
-		middleware.Recovery(cnt.Logger),
+		middleware.Logging(ctn.Logger),
+		middleware.Recovery(ctn.Logger),
 		middleware.CORS(),
 	)
 
@@ -38,12 +33,22 @@ func SetupRouter(cnt *container.Container) *gin.Engine {
 		// Группа уведомлений
 		notificationsGroup := apiV1.Group("/notifications")
 		{
-			notificationsGroup.POST("", handlers.NewCreateNotificationHandler(cnt.Service, cnt.Logger))
-			// notificationsGroup.GET("/:id", api.NewGetNotificationHandler(cnt.Getter, cnt.Logger))
+			notificationsGroup.POST("", handlers.NewCreateNotificationHandler(ctn.NotificationCreator, ctn.Logger))
+			notificationsGroup.GET("/:id", handlers.NewGetNotificationHandler(ctn.NotificationGetter, ctn.Logger))
+		}
+
+		// Группа шаблонов уведомлений
+		layoutsGroup := apiV1.Group("/layouts")
+		{
+			layoutsGroup.POST("", layoutHandlers.NewCreateLayoutHandler(ctn.LayoutCreator, ctn.Logger))
+			layoutsGroup.GET("/:id", layoutHandlers.NewGetLayoutHandler(ctn.LayoutGetter, ctn.Logger))
+			layoutsGroup.PUT("/:id", layoutHandlers.NewUpdateLayoutHandler(ctn.LayoutUpdater, ctn.Logger))
+			layoutsGroup.DELETE("/:id", layoutHandlers.NewDeleteLayoutHandler(ctn.LayoutDeleter, ctn.Logger))
+			layoutsGroup.GET("", layoutHandlers.NewListLayoutsHandler(ctn.LayoutLister, ctn.Logger))
 		}
 	}
 
-	// Health check вне API
+	// Health check
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})

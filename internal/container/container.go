@@ -5,17 +5,31 @@ import (
 	"os"
 
 	"notification/config"
-	createUseCase "notification/internal/app/notification/create"
+	createNotification "notification/internal/app/notification/create"
+	getNotification "notification/internal/app/notification/get"
+
+	createLayout "notification/internal/app/layout/create"
+	deleteLayout "notification/internal/app/layout/delete"
+	getLayout "notification/internal/app/layout/get"
+	listLayout "notification/internal/app/layout/list"
+	updateLayout "notification/internal/app/layout/update"
+
 	"notification/internal/infrastructure/notifiers/smtp"
 	"notification/internal/infrastructure/postgres"
 	"notification/pkg/logger"
 )
 
 type Container struct {
-	Config  config.Config
-	Logger  logger.Logger
-	DB      *postgres.Database
-	Service *createUseCase.Creator
+	Config              config.Config
+	Logger              logger.Logger
+	DB                  *postgres.Database
+	NotificationCreator *createNotification.Creator
+	NotificationGetter  *getNotification.Getter
+	LayoutGetter        *getLayout.Getter
+	LayoutLister        *listLayout.Lister
+	LayoutCreator       *createLayout.Creator
+	LayoutUpdater       *updateLayout.Updater
+	LayoutDeleter       *deleteLayout.Deleter
 }
 
 func Build(cfg config.Config) (*Container, error) {
@@ -27,20 +41,29 @@ func Build(cfg config.Config) (*Container, error) {
 	}
 
 	repo := postgres.NewNotificationRepository(db.GetDB())
-	smtpSender := smtp.NewSender(cfg, log)
-	notifier := createUseCase.NewNotifier(repo, smtpSender, log)
+	layoutRepo := postgres.NewLayoutRepository(db.GetDB())
 
-	notificationService := createUseCase.NewNotificationService(
-		repo,
-		notifier,
-		log,
-	)
+	smtpSender := smtp.NewSender(cfg, log)
+	notifier := createNotification.NewNotifier(repo, smtpSender, log)
+
+	// Layout
+	layoutGetter := getLayout.NewGetter(layoutRepo, log)
+	layoutLister := listLayout.NewLister(layoutRepo, log)
+	layoutCreator := createLayout.NewCreator(layoutRepo, log)
+	layoutUpdater := updateLayout.NewUpdater(layoutRepo, log)
+	layoutDeleter := deleteLayout.NewDeleter(layoutRepo, log)
 
 	return &Container{
-		Config:  cfg,
-		Logger:  log,
-		DB:      db,
-		Service: notificationService,
+		Config:              cfg,
+		Logger:              log,
+		DB:                  db,
+		NotificationCreator: createNotification.NewCreator(repo, notifier, log),
+		NotificationGetter:  getNotification.NewGetter(repo),
+		LayoutGetter:        layoutGetter,
+		LayoutLister:        layoutLister,
+		LayoutCreator:       layoutCreator,
+		LayoutUpdater:       layoutUpdater,
+		LayoutDeleter:       layoutDeleter,
 	}, nil
 }
 

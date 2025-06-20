@@ -14,6 +14,12 @@ import (
 	"time"
 )
 
+// @title Notification Service API
+// @version 1.0
+// @description API сервиса уведомлений
+// @host localhost:8080
+// @BasePath /api/v1
+// @schemes http https
 func main() {
 	// Инициализация логгера
 	log := logger.New(os.Stdout)
@@ -25,7 +31,7 @@ func main() {
 	}
 
 	// Инициализация DI-контейнера
-	ctn, err := container.Build(*cfg) // Исправлено cnt на ctn для консистентности
+	ctn, err := container.Build(*cfg)
 	if err != nil {
 		log.Fatal("Ошибка инициализации контейнера: %v", err)
 	}

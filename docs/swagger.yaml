@@ -1,52 +1,201 @@
 basePath: /api/v1
 definitions:
-  create.Request:
-    description: Модель запроса для создания уведомления
+  notification_internal_app_layout_create.Request:
     properties:
-      channel:
+      body:
+        minLength: 10
         type: string
-      message:
-        maxLength: 1000
+      description:
+        maxLength: 500
         type: string
-      recipient:
-        maxLength: 255
+      is_active:
+        type: boolean
+      name:
+        maxLength: 100
+        minLength: 3
         type: string
       subject:
-        maxLength: 100
+        maxLength: 200
+        minLength: 3
         type: string
+      type:
+        type: string
+      variables:
+        items:
+          type: string
+        type: array
     required:
-    - channel
-    - message
-    - recipient
+    - body
+    - name
     - subject
+    - type
+    - variables
     type: object
-  create.Response:
-    description: Стандартный ответ API
+  notification_internal_app_layout_create.Response:
+    properties:
+      body:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      subject:
+        type: string
+      type:
+        type: string
+      variables:
+        items:
+          type: string
+        type: array
+    type: object
+  notification_internal_app_layout_get.Response:
+    properties:
+      body:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      subject:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      variables:
+        items:
+          type: string
+        type: array
+      version:
+        type: integer
+    type: object
+  notification_internal_app_layout_list.Response:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  notification_internal_app_layout_update.Request:
+    properties:
+      body:
+        minLength: 10
+        type: string
+      description:
+        maxLength: 500
+        type: string
+      id:
+        description: |-
+          ID шаблона
+          required: true
+          example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      is_active:
+        type: boolean
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      subject:
+        maxLength: 200
+        minLength: 3
+        type: string
+      type:
+        type: string
+      variables:
+        items:
+          type: string
+        type: array
+      version:
+        description: |-
+          Версия для оптимистичной блокировки
+          required: true
+          example: 1
+        minimum: 1
+        type: integer
+    required:
+    - id
+    - variables
+    - version
+    type: object
+  notification_internal_app_layout_update.Response:
     properties:
       id:
         type: string
-      recipient:
+      name:
         type: string
-      status:
+      updated_at:
         type: string
+      version:
+        type: integer
     type: object
-  get.Response:
+  notification_internal_app_notification_create.Request:
+    description: Модель запроса для создания уведомления
     properties:
-      channel:
+      channels:
+        items:
+          type: string
+        minItems: 1
+        type: array
+      content:
         type: string
+      data:
+        additionalProperties: true
+        type: object
+      layout_id:
+        type: string
+      receiver:
+        type: string
+      title:
+        type: string
+    required:
+    - channels
+    - content
+    - layout_id
+    - receiver
+    - title
+    type: object
+  notification_internal_app_notification_create.Response:
+    description: Стандартный ответ API
+    properties:
       created_at:
         type: string
       id:
         type: string
-      message:
+      status:
         type: string
-      recipient:
+    type: object
+  notification_internal_app_notification_get.Response:
+    properties:
+      created_at:
+        type: string
+      id:
         type: string
       status:
         type: string
       subject:
-        type: string
-      updated_at:
         type: string
     type: object
 host: localhost:8080
@@ -56,6 +205,188 @@ info:
   title: Notification Service API
   version: "1.0"
 paths:
+  /layouts:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список шаблонов уведомлений с пагинацией
+      parameters:
+      - description: Тип шаблона
+        in: query
+        name: type
+        type: string
+      - description: Фильтр по активности
+        in: query
+        name: active
+        type: boolean
+      - description: Поисковая строка
+        in: query
+        name: search
+        type: string
+      - description: Лимит (default 10)
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение (default 0)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/notification_internal_app_layout_list.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить список шаблонов уведомлений
+      tags:
+      - Layouts
+    post:
+      consumes:
+      - application/json
+      description: Создает новый шаблон уведомления
+      parameters:
+      - description: Данные шаблона
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/notification_internal_app_layout_create.Request'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/notification_internal_app_layout_create.Response'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Создать новый шаблон уведомления
+      tags:
+      - Layouts
+  /layouts/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет шаблон уведомления по ID
+      parameters:
+      - description: ID шаблона
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Удалить шаблон уведомления
+      tags:
+      - Layouts
+    get:
+      consumes:
+      - application/json
+      description: Возвращает шаблон уведомления по ID
+      parameters:
+      - description: ID шаблона
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/notification_internal_app_layout_get.Response'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить шаблон уведомления
+      tags:
+      - Layouts
+    put:
+      consumes:
+      - application/json
+      description: Обновляет существующий шаблон уведомления
+      parameters:
+      - description: ID шаблона
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Данные для обновления
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/notification_internal_app_layout_update.Request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/notification_internal_app_layout_update.Response'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Обновить шаблон уведомления
+      tags:
+      - Layouts
   /notifications:
     post:
       consumes:
@@ -67,15 +398,27 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/create.Request'
+          $ref: '#/definitions/notification_internal_app_notification_create.Request'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/create.Response'
-      summary: Создать уведомление
+            $ref: '#/definitions/notification_internal_app_notification_create.Response'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Создание уведомления
       tags:
       - Notifications
   /notifications/{id}:
@@ -93,7 +436,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/get.Response'
+            $ref: '#/definitions/notification_internal_app_notification_get.Response'
       summary: Получить уведомление
       tags:
       - Notifications

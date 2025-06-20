@@ -1,6 +1,6 @@
 CREATE TABLE notifications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    layout_id UUID NOT NULL REFERENCES layouts(id),
+    layout_id UUID,
     status VARCHAR(20) NOT NULL DEFAULT 'pending',
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,

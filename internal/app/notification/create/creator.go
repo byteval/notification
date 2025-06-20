@@ -15,7 +15,7 @@ type Creator struct {
 	logger   logger.Logger
 }
 
-func NewNotificationService(
+func NewCreator(
 	repo ports.NotificationRepository,
 	notifier *Notifier,
 	logger logger.Logger,

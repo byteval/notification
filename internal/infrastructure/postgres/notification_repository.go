@@ -7,6 +7,7 @@ import (
 	"notification/internal/domain/notification"
 )
 
+// @see internal\domain\notification\repository.go
 type NotificationRepository struct {
 	db *sqlx.DB
 }
