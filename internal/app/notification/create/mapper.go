@@ -6,7 +6,7 @@ import (
 )
 
 // Request в доменную модель
-func (r Request) ToDomain() (*notification.Notification, error) {
+func ToDomain(r Request) (*notification.Notification, error) {
 	return &notification.Notification{
 		LayoutID:  r.LayoutID,
 		Status:    notification.StatusPending,

@@ -28,7 +28,7 @@ func NewCreator(
 }
 
 func (s *Creator) CreateNotification(ctx context.Context, req Request) (*Response, error) {
-	n, err := req.ToDomain()
+	n, err := ToDomain(req)
 	if err != nil {
 		s.logger.Error("Failed to convert request to domain", "error", err)
 		return nil, fmt.Errorf("failed to convert request to domain: %w", err)

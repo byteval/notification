@@ -10,10 +10,6 @@ import (
 	"notification/pkg/logger"
 )
 
-type DeliverySender interface {
-	Send(to string, subject string, message string) error
-}
-
 type Notifier struct {
 	repo       ports.NotificationRepository
 	smtpSender ports.SMTPSender
@@ -35,7 +31,7 @@ func NewNotifier(
 	}
 }
 
-// SendNotificationAsync безопасно запускает асинхронную отправку
+// Асинхронная отправка
 func (s *Notifier) SendNotificationAsync(n *notification.Notification) {
 	s.mu.Lock()
 	s.wg.Add(1)
@@ -58,21 +54,18 @@ func (s *Notifier) SendNotificationAsync(n *notification.Notification) {
 	}(s, n)
 }
 
-// sendNotification содержит основную логику отправки
+// Отправка уведомления
 func (s *Notifier) sendNotification(n *notification.Notification) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	time.Sleep(20 * time.Second)
-
-	// Отправка сообщения
 	s.logger.Info("Отправка уведомления")
 	s.smtpSender.Send(n.Receiver, n.Title, n.Content)
 
 	s.updateStatus(ctx, n, notification.StatusSent)
 }
 
-// updateStatus обновляет статус уведомления
+// Обновление статуса уведомления
 func (s *Notifier) updateStatus(ctx context.Context, n *notification.Notification, status notification.Status) {
 	s.logger.Info("Изменение статуса уведомления",
 		"notification_id", n.ID,
