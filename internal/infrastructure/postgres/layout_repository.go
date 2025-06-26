@@ -1,13 +1,12 @@
-// internal/infrastructure/postgres/layout_repository.go
 package postgres
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
 	"notification/internal/domain/layout"
+
+	"github.com/jmoiron/sqlx"
 )
 
 // @see internal\domain\layout\repository.go
@@ -22,7 +21,6 @@ func NewLayoutRepository(db *sqlx.DB) *LayoutRepository {
 func (r *LayoutRepository) Create(ctx context.Context, l *layout.Layout) (*layout.Layout, error) {
 	query := `
 		INSERT INTO layouts (
-			id, 
 			name, 
 			description, 
 			subject, 
@@ -32,7 +30,6 @@ func (r *LayoutRepository) Create(ctx context.Context, l *layout.Layout) (*layou
 			is_active, 
 			version
 		) VALUES (
-			:id, 
 			:name, 
 			:description, 
 			:subject, 
@@ -42,8 +39,8 @@ func (r *LayoutRepository) Create(ctx context.Context, l *layout.Layout) (*layou
 			:is_active, 
 			1
 		) RETURNING 
-			created_at, 
-			updated_at`
+		    id,
+			created_at`
 
 	rows, err := r.db.NamedQueryContext(ctx, query, l)
 	if err != nil {
@@ -68,9 +65,6 @@ func (r *LayoutRepository) GetByID(ctx context.Context, id string) (*layout.Layo
 
 	err := r.db.GetContext(ctx, &l, query, id)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, layout.ErrLayoutNotFound
-		}
 		return nil, fmt.Errorf("failed to get layout by id: %w", err)
 	}
 
@@ -110,9 +104,8 @@ func (r *LayoutRepository) Update(ctx context.Context, l *layout.Layout) (*layou
 			updated_at = NOW(),
 			version = version + 1
 		WHERE 
-			id = :id AND 
-			version = :version
-		RETURNING updated_at, version`
+			id = :id
+		RETURNING *`
 
 	result, err := tx.NamedExecContext(ctx, query, l)
 	if err != nil {

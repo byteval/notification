@@ -17,13 +17,6 @@ type Request struct {
 // Response определяет ответ после создания шаблона
 // swagger:model CreateLayoutResponse
 type Response struct {
-	ID          string    `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Subject     string    `json:"subject"`
-	Body        string    `json:"body"`
-	Type        string    `json:"type"`
-	Variables   []string  `json:"variables"`
-	IsActive    bool      `json:"is_active"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID        string    `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
 }

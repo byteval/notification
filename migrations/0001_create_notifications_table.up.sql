@@ -8,8 +8,7 @@ CREATE TABLE notifications (
     channels VARCHAR(20)[] NOT NULL,
     sent_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    receiver VARCHAR(255) NOT NULL,
-    type VARCHAR(20) NOT NULL
+    receiver VARCHAR(255) NOT NULL
 );
 
 CREATE INDEX idx_notifications_status ON notifications(status);

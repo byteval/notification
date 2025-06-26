@@ -3,6 +3,7 @@ package layouts
 import (
 	"net/http"
 
+	"notification/internal/app/layout/common"
 	"notification/internal/app/layout/update"
 	"notification/pkg/logger"
 
@@ -16,8 +17,8 @@ import (
 // @Accept  json
 // @Produce  json
 // @Param id path string true "ID шаблона"
-// @Param input body update.Request true "Данные для обновления"
-// @Success 200 {object} update.Response
+// @Param input body common.Request true "Данные для обновления"
+// @Success 200 {object} common.Response
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
@@ -30,7 +31,7 @@ func NewUpdateLayoutHandler(updater *update.Updater, log logger.Logger) gin.Hand
 			return
 		}
 
-		var req update.Request
+		var req common.Request
 		if err := c.ShouldBindJSON(&req); err != nil {
 			log.Error("Invalid request body", "error", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})

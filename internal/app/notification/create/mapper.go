@@ -3,6 +3,8 @@ package create
 import (
 	"notification/internal/domain/notification"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 // Request в доменную модель
@@ -12,8 +14,8 @@ func ToDomain(r Request) (*notification.Notification, error) {
 		Status:    notification.StatusPending,
 		Title:     r.Title,
 		Content:   r.Content,
-		Data:      notification.MapStringInterface(r.Data),
-		Channels:  notification.StringArray(r.Channels),
+		Data:      notification.JSONB(r.Data),
+		Channels:  pq.StringArray(r.Channels),
 		Receiver:  r.Receiver,
 		CreatedAt: time.Now().UTC(),
 	}, nil

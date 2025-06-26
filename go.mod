@@ -34,12 +34,14 @@ require (
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/gin-gonic/gin v1.10.1
 	github.com/jackc/pgx/v5 v5.7.5
+	github.com/lib/pq v1.10.9
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.4
 )
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/alitto/pond/v2 v2.4.0
 	github.com/go-openapi/jsonpointer v0.21.1 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/go-openapi/spec v0.21.0 // indirect

@@ -44,7 +44,7 @@ func Build(cfg config.Config) (*Container, error) {
 	layoutRepo := postgres.NewLayoutRepository(db.GetDB())
 
 	smtpSender := smtp.NewSender(cfg, log)
-	notifier := createNotification.NewNotifier(repo, smtpSender, log)
+	notifier := createNotification.NewNotifier(repo, layoutRepo, smtpSender, log, cfg.WorkerPool.Workers)
 
 	// Layout
 	layoutGetter := getLayout.NewGetter(layoutRepo, log)

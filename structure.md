@@ -15,30 +15,40 @@ notification/
 │    ├── app/                           # Операции / Use Cases
 │    │   ├── notification/              # Уведомления
 │    │   │   ├── create/                # Создание уведомления
-│    │   │   │   ├── creator.go         # Создание уведомления
+│    │   │   │   ├── handler.go         # Создание уведомления
 │    │   │   │   ├── notifier.go        # Отправка уведомления
 │    │   │   │   ├── mapper.go          # Маппинг ToDomain/ToResponse
+│    │   │   │   ├── template_renderer.go # Рендер уведомления
 │    │   │   │   └── dto.go             # DTO Request/Response
-│    │   │   └── get/                   # Получение уведомления
-│    │   │       ├── getter.go          
-│    │   │       ├── mapper.go          
-│    │   │       └── dto.go             
+│    │   │   ├── get/                   # Получение уведомления
+│    │   │   │   ├── handler.go          
+│    │   │   │   ├── mapper.go          
+│    │   │   │   └── dto.go    
+│    │   │   └── mailprocessor/         # Получение ответов на уведомления
+│    │   │       ├── handler.go          
+│    │   │       ├── validator.go          
+│    │   │       └── notifier.go             
 │    │   └── layout/                    # Шаблоны уведомлений
+│    │       ├── common/                # Общие DTO и функции
+│    │       │   ├── mapper.go
+│    │       │   └── dto.go             # Общие DTO
 │    │       ├── create/
-│    │       │   ├── creator.go
+│    │       │   ├── handler.go
 │    │       │   ├── validator.go
 │    │       │   └── dto.go
 │    │       ├── update/
-│    │       │   ├── updater.go
-│    │       │   └── dto.go
+│    │       │   ├── handler.go
+│    │       │   └── mapper.go
 │    │       ├── get/
-│    │       │   ├── getter.go     
+│    │       │   ├── handler.go     
 │    │       │   └── dto.go
 │    │       ├── list/
-│    │       │   ├── lister.go
+│    │       │   ├── handler.go
+│    │       │   ├── mapper.go
 │    │       │   └── dto.go
 │    │       └── delete/
-│    │           └── deleter.go
+│    │           ├── dto.go
+│    │           └── handler.go
 │    ├── container/            
 │    │   └── container.go               # Контейнер DI
 │    ├── domain/     

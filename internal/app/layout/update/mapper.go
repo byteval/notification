@@ -1,11 +1,12 @@
 package update
 
 import (
+	"notification/internal/app/layout/common"
 	"notification/internal/domain/layout"
 )
 
 // ToDomain применяет изменения из Request к существующей доменной модели
-func (r Request) ToDomain(existing *layout.Layout) (*layout.Layout, error) {
+func ToDomain(r common.Request, existing *layout.Layout) (*layout.Layout, error) {
 	if r.Name != "" {
 		existing.Name = r.Name
 	}
@@ -27,9 +28,18 @@ func (r Request) ToDomain(existing *layout.Layout) (*layout.Layout, error) {
 }
 
 // ToResponse преобразует доменную модель в Response
-func ToResponse(l *layout.Layout) *Response {
-	return &Response{
-		UpdatedAt: l.UpdatedAt,
-		Version:   l.Version,
+func ToResponse(l *layout.Layout) *common.Response {
+	return &common.Response{
+		ID:          l.ID,
+		Name:        l.Name,
+		Description: l.Description,
+		Subject:     l.Subject,
+		Body:        l.Body,
+		Type:        l.Type,
+		Variables:   l.Variables,
+		IsActive:    l.IsActive,
+		CreatedAt:   l.CreatedAt,
+		UpdatedAt:   l.UpdatedAt,
+		Version:     l.Version,
 	}
 }

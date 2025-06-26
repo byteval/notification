@@ -31,7 +31,7 @@ func NewGetLayoutHandler(getter *get.Getter, log logger.Logger) gin.HandlerFunc 
 		resp, err := getter.Execute(c.Request.Context(), id)
 		if err != nil {
 			log.Error("Failed to get layout", "error", err, "id", id)
-			c.JSON(http.StatusNotFound, gin.H{"error": "layout not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
 

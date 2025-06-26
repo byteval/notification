@@ -29,7 +29,7 @@ func NewCreateLayoutHandler(creator *create.Creator, log logger.Logger) gin.Hand
 			return
 		}
 
-		resp, err := creator.Create(c.Request.Context(), req)
+		resp, err := creator.Execute(c.Request.Context(), req)
 		if err != nil {
 			log.Error("Failed to create layout", "error", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

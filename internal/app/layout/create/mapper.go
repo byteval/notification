@@ -6,7 +6,7 @@ import (
 )
 
 // ToDomain преобразует Request в доменную модель Layout
-func (r Request) ToDomain() (*layout.Layout, error) {
+func ToDomain(r Request) (*layout.Layout, error) {
 	return &layout.Layout{
 		Name:        r.Name,
 		Description: r.Description,

@@ -14,6 +14,10 @@ type Config struct {
 		WriteTimeout time.Duration `env:"SERVER_WRITE_TIMEOUT" envDefault:"15s"`
 	}
 
+	WorkerPool struct {
+		Workers int `env:"WORKER_POOL_WORKERS" envDefault:"50"`
+	}
+
 	Database struct {
 		Host            string        `env:"DB_HOST" envDefault:"localhost"`
 		Port            int           `env:"DB_PORT" envDefault:"5432"`
