@@ -3,6 +3,7 @@ package layouts
 import (
 	"net/http"
 
+	_ "notification/internal/app/layout/common"
 	"notification/internal/app/layout/get"
 	"notification/pkg/logger"
 
@@ -16,7 +17,7 @@ import (
 // @Accept  json
 // @Produce  json
 // @Param id path string true "ID шаблона"
-// @Success 200 {object} get.Response
+// @Success 200 {object} common.Response
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /layouts/{id} [get]

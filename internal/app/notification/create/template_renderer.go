@@ -33,14 +33,12 @@ func (r *TemplateRenderer) Render(ctx context.Context, n *notification.Notificat
 		return "", "", fmt.Errorf("layout %s is not active", layout.ID)
 	}
 
-	data := r.prepareTemplateData(n)
-
-	title, err := r.renderTemplate(layout.Subject, data)
+	title, err := r.renderTemplate(layout.Subject, n.Data)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to render title: %w", err)
 	}
 
-	content, err := r.renderTemplate(layout.Body, data)
+	content, err := r.renderTemplate(layout.Body, n.Data)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to render content: %w", err)
 	}
@@ -60,15 +58,4 @@ func (r *TemplateRenderer) renderTemplate(tmplText string, data map[string]inter
 	}
 
 	return buf.String(), nil
-}
-
-func (r *TemplateRenderer) prepareTemplateData(n *notification.Notification) map[string]interface{} {
-	data := make(map[string]interface{})
-
-	// Копируем данные из notification.Data
-	for k, v := range n.Data {
-		data[k] = v
-	}
-
-	return data
 }

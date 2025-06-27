@@ -15,6 +15,8 @@ import (
 )
 
 func SetupRouter(ctn *container.Container) *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
+
 	router := gin.Default()
 
 	// Глобальные middleware

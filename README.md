@@ -7,6 +7,46 @@
 - github.com/lib/pq
 - github.com/jmoiron/sqlx
 
+### Структура проекта
+```
+notification/
+├── cmd/                                # Точка входа
+├── config/                             # Конфигурация
+├── docs/                               # Swagger
+├── migrations/                         # Миграции
+├── internal/
+│    ├── app/                           # Операции / Use Cases
+│    │   └── notification/              # Уведомления
+│    │       └── create/                # Создание уведомления
+│    │           ├── handler.go         # Хэндлер операции
+│    │           ├── mapper.go          # Маппинг ToDomain/ToResponse
+│    │           └── dto.go             # DTO Request/Response
+│    ├── container/            
+│    │   └── container.go               # Контейнер DI
+│    ├── domain/                        # Domain: Сущности, Интерфейсы сервисов, Бизнес-правила
+│    │   └── notification/              
+│    │         ├── notification.go      # Модель (Notification)
+│    │         └── ports/               # Интерфейсы сервисов
+│    │             └── repository.go    # Интерфейс репозитория Notification
+│    ├── transport/
+│    │   └── http/                      # API 
+│    │       ├── handlers/              # Обработчики HTTP запросов
+│    │       │   └── notifications/
+│    │       │       ├── create.go      # POST /notifications
+│    │       │       └── get.go         # GET /notifications/{id}    
+│    │       ├── middleware/
+│    │       │   ├── middleware.go   
+│    │       │   └── validator.go   
+│    │       └── router.go
+│    └── infrastructure/                # Реализации (БД, SMTP и т.д.)
+│        └── postgres/
+│            ├── database.go            # Подключение к СУБД POSTGRES
+│            └── notification_repository.go
+├── test/ 
+```
+[Полное описание структуры проекта](./structure.md)
+
+
 ### Миграции - golang-migrate
 
 1. Создание миграций

@@ -10,6 +10,12 @@ import (
 type NotificationRepository interface {
 	Create(ctx context.Context, n *notification.Notification) (*notification.Notification, error)
 
+	CreateWithReceivers(
+		ctx context.Context,
+		n *notification.Notification,
+		receivers []notification.NotificationReceiver,
+	) (*notification.Notification, error)
+
 	GetByID(ctx context.Context, id string) (*notification.Notification, error)
 
 	UpdateStatus(ctx context.Context, id string, status notification.Status) error

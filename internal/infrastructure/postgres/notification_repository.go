@@ -42,6 +42,51 @@ func (r *NotificationRepository) Create(ctx context.Context, n *notification.Not
 	return n, nil
 }
 
+func (r *NotificationRepository) CreateWithReceivers(
+	ctx context.Context,
+	n *notification.Notification,
+	receivers []notification.NotificationReceiver,
+) (*notification.Notification, error) {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	// Создаем основное уведомление
+	err = tx.QueryRowContext(ctx,
+		`INSERT INTO notifications (layout_id, title, data, created_at)
+		 VALUES ($1, $2, $3, $4) RETURNING id`,
+		n.LayoutID, n.Title, n.Data, n.CreatedAt,
+	).Scan(&n.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Создаем получателей
+	for i := range receivers {
+		receivers[i].NotificationID = n.ID
+		err = tx.QueryRowContext(ctx,
+			`INSERT INTO notification_receivers 
+			 (notification_id, email, status)
+			 VALUES ($1, $2, $3) RETURNING id`,
+			receivers[i].NotificationID,
+			receivers[i].Email,
+			receivers[i].Status,
+		).Scan(&receivers[i].ID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	n.NotificationReceivers = receivers
+	return n, nil
+}
+
 func (r *NotificationRepository) GetByID(ctx context.Context, id string) (*notification.Notification, error) {
 	query := `
 		SELECT *
@@ -60,7 +105,7 @@ func (r *NotificationRepository) GetByID(ctx context.Context, id string) (*notif
 
 func (r *NotificationRepository) UpdateStatus(ctx context.Context, id string, status notification.Status) error {
 	query := `
-		UPDATE notifications
+		UPDATE notification_receivers
 		SET status = $1
 		WHERE id = $2
 	`

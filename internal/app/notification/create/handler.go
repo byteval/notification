@@ -3,7 +3,6 @@ package create
 import (
 	"context"
 	"fmt"
-	"notification/internal/domain/notification"
 	"notification/internal/domain/notification/ports"
 	"notification/pkg/logger"
 	"time"
@@ -28,16 +27,17 @@ func NewCreator(
 }
 
 func (s *Creator) CreateNotification(ctx context.Context, req Request) (*Response, error) {
-	n, err := ToDomain(req)
+	req = *s.checkUniqueReceiver(&req)
+
+	n, receivers, err := ToDomain(req)
 	if err != nil {
 		s.logger.Error("Failed to convert request to domain", "error", err)
 		return nil, fmt.Errorf("failed to convert request to domain: %w", err)
 	}
 
 	n.CreatedAt = time.Now()
-	n.Status = notification.StatusPending
 
-	created, err := s.repo.Create(ctx, n)
+	created, err := s.repo.CreateWithReceivers(ctx, n, receivers)
 
 	if err != nil {
 		s.logger.Error("Failed to save notification", "error", err)
@@ -47,4 +47,20 @@ func (s *Creator) CreateNotification(ctx context.Context, req Request) (*Respons
 	s.notifier.SendNotificationAsync(n)
 
 	return ToResponse(created), nil
+}
+
+// Оставляем только уникальных получателей
+func (s *Creator) checkUniqueReceiver(req *Request) *Request {
+	uniqueMap := make(map[string]bool, len(req.Emails))
+	uniqueSlice := make([]string, 0, len(req.Emails))
+
+	for _, email := range req.Emails {
+		if _, exists := uniqueMap[email]; !exists {
+			uniqueMap[email] = true
+			uniqueSlice = append(uniqueSlice, email)
+		}
+	}
+
+	req.Emails = uniqueSlice
+	return req
 }

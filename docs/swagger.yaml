@@ -1,104 +1,6 @@
 basePath: /api/v1
 definitions:
-  notification_internal_app_layout_create.Request:
-    properties:
-      body:
-        minLength: 10
-        type: string
-      description:
-        maxLength: 500
-        type: string
-      is_active:
-        type: boolean
-      name:
-        maxLength: 100
-        minLength: 3
-        type: string
-      subject:
-        maxLength: 200
-        minLength: 3
-        type: string
-      type:
-        type: string
-      variables:
-        items:
-          type: string
-        type: array
-    required:
-    - body
-    - name
-    - subject
-    - type
-    - variables
-    type: object
-  notification_internal_app_layout_create.Response:
-    properties:
-      body:
-        type: string
-      created_at:
-        type: string
-      description:
-        type: string
-      id:
-        type: string
-      is_active:
-        type: boolean
-      name:
-        type: string
-      subject:
-        type: string
-      type:
-        type: string
-      variables:
-        items:
-          type: string
-        type: array
-    type: object
-  notification_internal_app_layout_get.Response:
-    properties:
-      body:
-        type: string
-      created_at:
-        type: string
-      description:
-        type: string
-      id:
-        type: string
-      is_active:
-        type: boolean
-      name:
-        type: string
-      subject:
-        type: string
-      type:
-        type: string
-      updated_at:
-        type: string
-      variables:
-        items:
-          type: string
-        type: array
-      version:
-        type: integer
-    type: object
-  notification_internal_app_layout_list.Response:
-    properties:
-      created_at:
-        type: string
-      description:
-        type: string
-      id:
-        type: string
-      is_active:
-        type: boolean
-      name:
-        type: string
-      type:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  notification_internal_app_layout_update.Request:
+  notification_internal_app_layout_common.Request:
     properties:
       body:
         minLength: 10
@@ -140,39 +42,114 @@ definitions:
     - variables
     - version
     type: object
-  notification_internal_app_layout_update.Response:
+  notification_internal_app_layout_common.Response:
     properties:
+      body:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
       id:
         type: string
+      is_active:
+        type: boolean
       name:
+        type: string
+      subject:
+        type: string
+      type:
         type: string
       updated_at:
         type: string
+      variables:
+        items:
+          type: string
+        type: array
       version:
         type: integer
+    type: object
+  notification_internal_app_layout_create.Request:
+    properties:
+      body:
+        minLength: 10
+        type: string
+      description:
+        maxLength: 500
+        type: string
+      is_active:
+        type: boolean
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      subject:
+        maxLength: 200
+        minLength: 3
+        type: string
+      type:
+        type: string
+      variables:
+        items:
+          type: string
+        type: array
+    required:
+    - body
+    - name
+    - subject
+    - type
+    - variables
+    type: object
+  notification_internal_app_layout_create.Response:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+    type: object
+  notification_internal_app_layout_list.Response:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  notification_internal_app_notification_create.ReceiverResponse:
+    properties:
+      email:
+        type: string
+      status:
+        type: string
     type: object
   notification_internal_app_notification_create.Request:
     description: Модель запроса для создания уведомления
     properties:
-      channels:
-        items:
-          type: string
-        minItems: 1
-        type: array
-      content:
-        type: string
       data:
         additionalProperties: true
         type: object
       layout_id:
+        description: '@Schema(example="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", format="uuid",
+          description="ID шаблона")'
         type: string
       receiver:
-        type: string
+        description: '@Schema(example="[test@php2go.com]", format="array", description="Email
+          получателя")'
+        items:
+          type: string
+        type: array
       title:
         type: string
     required:
-    - channels
-    - content
     - layout_id
     - receiver
     - title
@@ -184,6 +161,10 @@ definitions:
         type: string
       id:
         type: string
+      receivers:
+        items:
+          $ref: '#/definitions/notification_internal_app_notification_create.ReceiverResponse'
+        type: array
       status:
         type: string
     type: object
@@ -327,7 +308,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/notification_internal_app_layout_get.Response'
+            $ref: '#/definitions/notification_internal_app_layout_common.Response'
         "404":
           description: Not Found
           schema:
@@ -358,14 +339,14 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/notification_internal_app_layout_update.Request'
+          $ref: '#/definitions/notification_internal_app_layout_common.Request'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/notification_internal_app_layout_update.Response'
+            $ref: '#/definitions/notification_internal_app_layout_common.Response'
         "400":
           description: Bad Request
           schema:

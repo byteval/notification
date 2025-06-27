@@ -3,29 +3,44 @@ package create
 import (
 	"notification/internal/domain/notification"
 	"time"
-
-	"github.com/lib/pq"
 )
 
-// Request в доменную модель
-func ToDomain(r Request) (*notification.Notification, error) {
-	return &notification.Notification{
+// ToDomain конвертирует Request в доменную модель Notification и список ReceiverEmail
+func ToDomain(r Request) (*notification.Notification, []notification.NotificationReceiver, error) {
+	// Создаем основное уведомление
+	n := &notification.Notification{
 		LayoutID:  r.LayoutID,
-		Status:    notification.StatusPending,
 		Title:     r.Title,
-		Content:   r.Content,
 		Data:      notification.JSONB(r.Data),
-		Channels:  pq.StringArray(r.Channels),
-		Receiver:  r.Receiver,
 		CreatedAt: time.Now().UTC(),
-	}, nil
+	}
+
+	// Создаем получателей
+	var receivers []notification.NotificationReceiver
+	for _, email := range r.Emails {
+		receivers = append(receivers, notification.NotificationReceiver{
+			Email:  email,
+			Status: notification.StatusPending,
+		})
+	}
+
+	return n, receivers, nil
 }
 
-// Response из доменной модели
+// ToResponse конвертирует доменную модель в Response
 func ToResponse(n *notification.Notification) *Response {
-	return &Response{
+	response := &Response{
 		ID:        n.ID,
-		Status:    string(n.Status),
 		CreatedAt: n.CreatedAt,
 	}
+
+	// Добавляем информацию о получателях
+	for _, receiver := range n.NotificationReceivers {
+		response.Receivers = append(response.Receivers, ReceiverResponse{
+			Email:  receiver.Email,
+			Status: string(receiver.Status),
+		})
+	}
+
+	return response
 }

@@ -41,57 +41,61 @@ func NewNotifier(
 
 // Отправляем уведомление через пул воркеров
 func (s *Notifier) SendNotificationAsync(n *notification.Notification) {
-	s.pool.Submit(func() {
-		// Добавляем recover для отлова паник
-		defer func() {
-			if r := recover(); r != nil {
-				s.logger.Error("Recovered from panic in sender",
-					"panic", r,
-					"notification_id", n.ID)
+	for _, nr := range n.NotificationReceivers {
+		s.pool.Submit(func() {
+			// Добавляем recover для отлова паник
+			defer func() {
+				if r := recover(); r != nil {
+					s.logger.Error("Recovered from panic in sender",
+						"panic", r,
+						"notification_id", n.ID,
+						"notification_receiver_id", nr.ID,
+					)
 
-				// Пытаемся сохранить статус "failed" даже при панике
-				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-				defer cancel()
-				s.updateStatus(ctx, n, notification.StatusFailed)
+					// Пытаемся сохранить статус "failed" при панике
+					ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+					defer cancel()
+					s.updateStatus(ctx, nr, notification.StatusFailed)
+				}
+			}()
+
+			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+			defer cancel()
+
+			// Рендер заголовка и текста уведомления
+			title, content, err := s.templateRenderer.Render(ctx, n)
+			if err != nil {
+				s.logFailed(ctx, err, nr)
+				return
 			}
-		}()
 
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-		defer cancel()
+			sendErr := s.smtpSender.Send(nr.Email, title, content)
+			if sendErr == nil {
+				s.updateStatus(ctx, nr, notification.StatusSent)
+				return
+			}
 
-		// Рендер заголовка и текста уведомления
-		title, content, err := s.templateRenderer.Render(ctx, n)
-		if err != nil {
-			s.logFailed(ctx, err, n)
-			return
-		}
-
-		sendErr := s.smtpSender.Send(n.Receiver, title, content)
-		if sendErr == nil {
-			s.updateStatus(ctx, n, notification.StatusSent)
-			return
-		}
-
-		s.logFailed(ctx, sendErr, n)
-	})
+			s.logFailed(ctx, sendErr, nr)
+		})
+	}
 }
 
 // Логирование ошибок
-func (s *Notifier) logFailed(ctx context.Context, sendErr error, n *notification.Notification) {
-	s.logger.Error("Send failed", "error", sendErr, "notification_id", n.ID)
-	s.updateStatus(ctx, n, notification.StatusFailed)
+func (s *Notifier) logFailed(ctx context.Context, sendErr error, nr notification.NotificationReceiver) {
+	s.logger.Error("Send failed", "error", sendErr, "notification_receiver_id", nr.ID)
+	s.updateStatus(ctx, nr, notification.StatusFailed)
 }
 
 // Обновление статуса уведомления
-func (s *Notifier) updateStatus(ctx context.Context, n *notification.Notification, status notification.Status) {
+func (s *Notifier) updateStatus(ctx context.Context, nr notification.NotificationReceiver, status notification.Status) {
 	s.logger.Info("Изменение статуса уведомления",
-		"notification_id", n.ID,
+		"notification_receiver_id", nr.ID,
 		"status", status)
 
-	if err := s.repo.UpdateStatus(ctx, n.ID, status); err != nil {
+	if err := s.repo.UpdateStatus(ctx, nr.ID, status); err != nil {
 		s.logger.Error("Failed to update status",
 			"error", err,
-			"notification_id", n.ID,
+			"notification_receiver_id", nr.ID,
 			"status", status)
 	}
 }

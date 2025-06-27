@@ -27,13 +27,13 @@ func main() {
 	// Инициализация конфигурации
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatal("Ошибка загрузки конфигурации: %v", err)
+		log.Fatal("Ошибка загрузки конфигурации:", "error", err)
 	}
 
 	// Инициализация DI-контейнера
 	ctn, err := container.Build(*cfg)
 	if err != nil {
-		log.Fatal("Ошибка инициализации контейнера: %v", err)
+		log.Fatal("Ошибка инициализации контейнера:", "error", err)
 	}
 
 	// Инициализация HTTP сервера
@@ -44,10 +44,10 @@ func main() {
 	defer stop()
 
 	// Запуск сервера в goroutine
-	log.Info("Запуск сервера на порту :%d", cfg.HTTP.Port)
+	log.Info("Запуск сервера", "port", cfg.HTTP.Port)
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Error("Ошибка запуска сервера: %v", err)
+			log.Error("Ошибка запуска сервера", "error", err)
 			os.Exit(1) // Выход при ошибке запуска
 		}
 	}()
@@ -61,7 +61,7 @@ func main() {
 	defer cancel()
 
 	if err := srv.Shutdown(shutdownCtx); err != nil {
-		log.Error("Ошибка graceful shutdown сервера: %v", err)
+		log.Error("Ошибка graceful shutdown сервера", "error", err)
 	} else {
 		log.Info("Сервер успешно остановлен")
 	}

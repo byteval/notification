@@ -51,7 +51,7 @@ notification/
 │    │           └── handler.go
 │    ├── container/            
 │    │   └── container.go               # Контейнер DI
-│    ├── domain/     
+│    ├── domain/                        # Domain: Сущности, Интерфейсы сервисов, Бизнес-правила
 │    │   ├── notification/              
 │    │   │     ├── errors.go            # Структура с описанием ошибок
 │    │   │     ├── notification.go      # Модель (Notification)
@@ -64,10 +64,9 @@ notification/
 │    │       ├── layout.go              # Модель (Layout)
 │    │       ├── errors.go
 │    │       └── ports/
-│    │           ├── repository.go
-│    │           └── renderer.go        # Интерфейс для рендеринга
+│    │           └── repository.go
 │    ├── transport/
-│    │   └── http/
+│    │   └── http/                      # API 
 │    │       ├── handlers/              # Обработчики HTTP запросов
 │    │       │   ├── healthcheck.go
 │    │       │   ├── notifications/
@@ -78,14 +77,12 @@ notification/
 │    │       │       ├── update.go      # PUT /layouts/{id}
 │    │       │       ├── get.go         # GET /layouts/{id}
 │    │       │       ├── list.go        # GET /layouts
-│    │       │       ├── delete.go      # DELETE /layouts/{id}
-│    │       │       └── render.go      # POST /layouts/{id}/render
+│    │       │       └── delete.go      # DELETE /layouts/{id}
 │    │       ├── middleware/
 │    │       │   ├── middleware.go   
 │    │       │   └── validator.go   
 │    │       └── router.go
-│    ├── errors/      
-│    ├── infrastructure/                # Реализации (БД, SMTP и т.д.) technical details
+│    ├── infrastructure/                # Реализации (БД, SMTP и т.д.)
 │    │   ├── postgres/
 │    │   │   ├── database.go            # Подключение к СУБД POSTGRES
 │    │   │   ├── notification_repository.go

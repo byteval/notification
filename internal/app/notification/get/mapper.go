@@ -12,7 +12,6 @@ func ToResponse(n *notification.Notification) *Response {
 	return &Response{
 		ID:        n.ID,
 		Title:     n.Title,
-		Status:    string(n.Status),
 		CreatedAt: n.CreatedAt,
 	}
 }

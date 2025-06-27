@@ -155,7 +155,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/notification_internal_app_layout_get.Response"
+                            "$ref": "#/definitions/notification_internal_app_layout_common.Response"
                         }
                     },
                     "404": {
@@ -204,7 +204,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/notification_internal_app_layout_update.Request"
+                            "$ref": "#/definitions/notification_internal_app_layout_common.Request"
                         }
                     }
                 ],
@@ -212,7 +212,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/notification_internal_app_layout_update.Response"
+                            "$ref": "#/definitions/notification_internal_app_layout_common.Response"
                         }
                     },
                     "400": {
@@ -373,151 +373,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "notification_internal_app_layout_create.Request": {
-            "type": "object",
-            "required": [
-                "body",
-                "name",
-                "subject",
-                "type",
-                "variables"
-            ],
-            "properties": {
-                "body": {
-                    "type": "string",
-                    "minLength": 10
-                },
-                "description": {
-                    "type": "string",
-                    "maxLength": 500
-                },
-                "is_active": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 3
-                },
-                "subject": {
-                    "type": "string",
-                    "maxLength": 200,
-                    "minLength": 3
-                },
-                "type": {
-                    "type": "string"
-                },
-                "variables": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "notification_internal_app_layout_create.Response": {
-            "type": "object",
-            "properties": {
-                "body": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "is_active": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "subject": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "variables": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "notification_internal_app_layout_get.Response": {
-            "type": "object",
-            "properties": {
-                "body": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "is_active": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "subject": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "variables": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "version": {
-                    "type": "integer"
-                }
-            }
-        },
-        "notification_internal_app_layout_list.Response": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "is_active": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "notification_internal_app_layout_update.Request": {
+        "notification_internal_app_layout_common.Request": {
             "type": "object",
             "required": [
                 "id",
@@ -566,20 +422,134 @@ const docTemplate = `{
                 }
             }
         },
-        "notification_internal_app_layout_update.Response": {
+        "notification_internal_app_layout_common.Response": {
             "type": "object",
             "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
+                "is_active": {
+                    "type": "boolean"
+                },
                 "name": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
                 },
+                "variables": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "version": {
                     "type": "integer"
+                }
+            }
+        },
+        "notification_internal_app_layout_create.Request": {
+            "type": "object",
+            "required": [
+                "body",
+                "name",
+                "subject",
+                "type",
+                "variables"
+            ],
+            "properties": {
+                "body": {
+                    "type": "string",
+                    "minLength": 10
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3
+                },
+                "subject": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "minLength": 3
+                },
+                "type": {
+                    "type": "string"
+                },
+                "variables": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "notification_internal_app_layout_create.Response": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "notification_internal_app_layout_list.Response": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "notification_internal_app_notification_create.ReceiverResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -587,32 +557,25 @@ const docTemplate = `{
             "description": "Модель запроса для создания уведомления",
             "type": "object",
             "required": [
-                "channels",
-                "content",
                 "layout_id",
                 "receiver",
                 "title"
             ],
             "properties": {
-                "channels": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "content": {
-                    "type": "string"
-                },
                 "data": {
                     "type": "object",
                     "additionalProperties": true
                 },
                 "layout_id": {
+                    "description": "@Schema(example=\"a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\", format=\"uuid\", description=\"ID шаблона\")",
                     "type": "string"
                 },
                 "receiver": {
-                    "type": "string"
+                    "description": "@Schema(example=\"[test@php2go.com]\", format=\"array\", description=\"Email получателя\")",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "title": {
                     "type": "string"
@@ -628,6 +591,12 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "receivers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/notification_internal_app_notification_create.ReceiverResponse"
+                    }
                 },
                 "status": {
                     "type": "string"

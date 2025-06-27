@@ -6,3 +6,4 @@ vendor.cp/
 *__debug_bin
 .env
 .gitconfig
+cmd/notification-server/*.exe
