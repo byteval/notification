@@ -21,7 +21,6 @@ type Notifier struct {
 	templateRenderer *TemplateRenderer
 }
 
-// NewNotifier создает новый Notifier и возвращает указатель на него
 func NewNotifier(
 	repo ports.NotificationRepository,
 	layoutRepo layoutPorts.LayoutRepository,
@@ -97,7 +96,11 @@ func (s *Notifier) logFailed(ctx context.Context, sendErr error, nr notification
 }
 
 // Обновление статуса уведомления
-func (s *Notifier) updateStatus(ctx context.Context, nr notification.NotificationReceiver, status notification.Status) {
+func (s *Notifier) updateStatus(
+	ctx context.Context,
+	nr notification.NotificationReceiver,
+	status notification.Status,
+) {
 	s.logger.Info("Изменение статуса уведомления",
 		"notification_receiver_id", nr.ID,
 		"status", status)

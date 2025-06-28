@@ -1,7 +1,5 @@
 package create
 
-import "time"
-
 // Request - модель запроса для создания уведомления
 // @Description Модель запроса для создания уведомления
 type Request struct {
@@ -17,26 +15,4 @@ type Attachment struct {
 	ContentType string `json:"content_type"`
 	Size        int64  `json:"size"`
 	FilePath    string `json:"-"`
-}
-
-// Response - модель успешного ответа
-// @name Response
-// @Description Стандартный ответ API
-type Response struct {
-	ID          string               `json:"id"`
-	Status      string               `json:"status"`
-	CreatedAt   time.Time            `json:"created_at"`
-	Receivers   []ReceiverResponse   `json:"receivers,omitempty"`
-	Attachments []AttachmentResponse `json:"attachments,omitempty"`
-}
-
-// ReceiverResponse - модель ответа для получателей
-type ReceiverResponse struct {
-	Email  string `json:"email"`
-	Status string `json:"status"`
-}
-
-type AttachmentResponse struct {
-	FileName string `json:"filename"`
-	Size     int64  `json:"size"`
 }

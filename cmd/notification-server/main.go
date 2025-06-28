@@ -21,62 +21,79 @@ import (
 // @BasePath /api/v1
 // @schemes http https
 func main() {
-	// Инициализация логгера
-	log := logger.New(os.Stdout)
+	logger := logger.New(os.Stdout)
 
-	// Инициализация конфигурации
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatal("Ошибка загрузки конфигурации:", "error", err)
+		logger.Fatal("Configuration loading error:", "error", err)
 	}
 
-	// Инициализация DI-контейнера
 	ctn, err := container.Build(*cfg)
 	if err != nil {
-		log.Fatal("Ошибка инициализации контейнера:", "error", err)
+		logger.Fatal("Container initialization error:", "error", err)
 	}
 
-	// Инициализация HTTP сервера
 	srv := initHttpServer(ctn, *cfg)
 
 	// Graceful shutdown
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	// Запуск сервера в goroutine
-	log.Info("Запуск сервера", "port", cfg.HTTP.Port)
+	logger.Info("Starting the server", "port", cfg.HTTP.Port)
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Error("Ошибка запуска сервера", "error", err)
-			os.Exit(1) // Выход при ошибке запуска
+			logger.Error("Server startup error", "error", err)
+			os.Exit(1)
 		}
 	}()
 
-	// Ожидание сигнала завершения
+	ReadingIncomingMail(ctx, ctn, *cfg, logger)
+
 	<-ctx.Done()
-	log.Info("Получен сигнал завершения работы")
+	logger.Info("A shutdown signal has been received")
 
 	// Graceful shutdown с таймаутом
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(shutdownCtx); err != nil {
-		log.Error("Ошибка graceful shutdown сервера", "error", err)
+		logger.Error("Graceful server shutdown error", "error", err)
 	} else {
-		log.Info("Сервер успешно остановлен")
+		logger.Info("The server has been successfully stopped")
 	}
 }
 
 func initHttpServer(cnt *container.Container, cfg config.Config) *http.Server {
-	// Инициализация роутеров
 	r := api.SetupRouter(cnt)
 
 	return &http.Server{
-		Addr:    ":" + strconv.Itoa(cfg.HTTP.Port),
-		Handler: r,
-		// Дополнительные настройки сервера
+		Addr:         ":" + strconv.Itoa(cfg.HTTP.Port),
+		Handler:      r,
 		ReadTimeout:  cfg.HTTP.ReadTimeout,
 		WriteTimeout: cfg.HTTP.WriteTimeout,
 		IdleTimeout:  15 * time.Second,
 	}
+}
+
+func ReadingIncomingMail(ctx context.Context, ctn *container.Container, cfg config.Config, logger logger.Logger) {
+	go func() {
+		if cfg.ReadInterval <= 0 {
+			logger.Error("The ticker interval must be > 0")
+			return
+		}
+
+		ticker := time.NewTicker(cfg.ReadInterval)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ticker.C:
+				if err := ctn.MailProcessor.Execute(ctx); err != nil {
+					logger.Error("mail processing failed", "error", err)
+				}
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
 }

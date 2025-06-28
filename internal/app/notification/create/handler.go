@@ -3,12 +3,13 @@ package create
 import (
 	"context"
 	"fmt"
+	"notification/internal/app/notification/common"
 	"notification/internal/domain/notification/ports"
 	"notification/pkg/logger"
 	"time"
 )
 
-type Creator struct {
+type NotificationCreator struct {
 	repo     ports.NotificationRepository
 	notifier *Notifier
 	logger   logger.Logger
@@ -18,15 +19,15 @@ func NewCreator(
 	repo ports.NotificationRepository,
 	notifier *Notifier,
 	logger logger.Logger,
-) *Creator {
-	return &Creator{
+) *NotificationCreator {
+	return &NotificationCreator{
 		repo:     repo,
 		notifier: notifier,
 		logger:   logger,
 	}
 }
 
-func (s *Creator) CreateNotification(ctx context.Context, req Request) (*Response, error) {
+func (s *NotificationCreator) Execute(ctx context.Context, req Request) (*common.Response, error) {
 	req = *s.checkUniqueReceiver(&req)
 
 	n, err := ToDomain(req)
@@ -46,11 +47,11 @@ func (s *Creator) CreateNotification(ctx context.Context, req Request) (*Respons
 
 	s.notifier.SendNotificationAsync(n)
 
-	return ToResponse(created), nil
+	return common.ToResponse(created), nil
 }
 
 // Оставляем только уникальных получателей
-func (s *Creator) checkUniqueReceiver(req *Request) *Request {
+func (s *NotificationCreator) checkUniqueReceiver(req *Request) *Request {
 	uniqueMap := make(map[string]bool, len(req.Emails))
 	uniqueSlice := make([]string, 0, len(req.Emails))
 

@@ -86,11 +86,31 @@ func (r *NotificationRepository) GetByID(ctx context.Context, id string) (*notif
 		FROM notifications 
 		WHERE id = $1
 	`
-
 	var n notification.Notification
 	err := r.db.GetContext(ctx, &n, query, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find notification: %w", err)
+	}
+
+	receiversQuery := `
+        SELECT id, notification_id, email, status
+        FROM notification_receivers
+        WHERE notification_id = $1
+    `
+	err = r.db.SelectContext(ctx, &n.NotificationReceivers, receiversQuery, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load notification receivers: %w", err)
+	}
+
+	attachmentsQuery := `
+	 SELECT id, notification_id, file_name, original_name, 
+			content_type, size, file_path, created_at
+	 FROM notification_attachments
+	 WHERE notification_id = $1
+ `
+	err = r.db.SelectContext(ctx, &n.Attachments, attachmentsQuery, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load notification attachments: %w", err)
 	}
 
 	return &n, nil

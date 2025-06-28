@@ -39,6 +39,8 @@ require (
 	github.com/swaggo/swag v1.16.4
 )
 
+require github.com/emersion/go-sasl v0.0.0-20200509203442-7bfe0ed36a21 // indirect
+
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/alitto/pond/v2 v2.4.0
@@ -54,6 +56,8 @@ require (
 )
 
 require (
+	github.com/emersion/go-imap v1.2.1
+	github.com/emersion/go-message v0.18.2
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect

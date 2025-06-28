@@ -5,15 +5,17 @@ import (
 	"os"
 
 	"notification/config"
-	createNotification "notification/internal/app/notification/create"
-	getNotification "notification/internal/app/notification/get"
+	notificationCreate "notification/internal/app/notification/create"
+	notificationGet "notification/internal/app/notification/get"
+	"notification/internal/app/notification/mailprocessor"
 
-	createLayout "notification/internal/app/layout/create"
-	deleteLayout "notification/internal/app/layout/delete"
-	getLayout "notification/internal/app/layout/get"
-	listLayout "notification/internal/app/layout/list"
-	updateLayout "notification/internal/app/layout/update"
+	layoutCreate "notification/internal/app/layout/create"
+	layoutDelete "notification/internal/app/layout/delete"
+	layoutGet "notification/internal/app/layout/get"
+	layoutList "notification/internal/app/layout/list"
+	layoutUpdate "notification/internal/app/layout/update"
 
+	"notification/internal/infrastructure/imap"
 	"notification/internal/infrastructure/notifiers/smtp"
 	"notification/internal/infrastructure/postgres"
 	"notification/pkg/logger"
@@ -23,19 +25,20 @@ type Container struct {
 	Config              config.Config
 	Logger              logger.Logger
 	DB                  *postgres.Database
-	NotificationCreator *createNotification.Creator
-	NotificationGetter  *getNotification.Getter
-	LayoutGetter        *getLayout.Getter
-	LayoutLister        *listLayout.Lister
-	LayoutCreator       *createLayout.Creator
-	LayoutUpdater       *updateLayout.Updater
-	LayoutDeleter       *deleteLayout.Deleter
+	NotificationCreator *notificationCreate.NotificationCreator
+	NotificationGetter  *notificationGet.NotificationGetter
+	LayoutGetter        *layoutGet.Getter
+	LayoutLister        *layoutList.Lister
+	LayoutCreator       *layoutCreate.Creator
+	LayoutUpdater       *layoutUpdate.Updater
+	LayoutDeleter       *layoutDelete.Deleter
+	MailProcessor       *mailprocessor.ProcessIncomingEmail
 }
 
 func Build(cfg config.Config) (*Container, error) {
 	log := logger.New(os.Stdout)
 
-	db, err := postgres.New(cfg)
+	db, err := postgres.New(cfg.Database)
 	if err != nil {
 		return nil, fmt.Errorf("database connection failed: %w", err)
 	}
@@ -43,27 +46,20 @@ func Build(cfg config.Config) (*Container, error) {
 	repo := postgres.NewNotificationRepository(db.GetDB())
 	layoutRepo := postgres.NewLayoutRepository(db.GetDB())
 
-	smtpSender := smtp.NewSender(cfg, log)
-	notifier := createNotification.NewNotifier(repo, layoutRepo, smtpSender, log, cfg.WorkerPool.Workers)
-
-	// Layout
-	layoutGetter := getLayout.NewGetter(layoutRepo, log)
-	layoutLister := listLayout.NewLister(layoutRepo, log)
-	layoutCreator := createLayout.NewCreator(layoutRepo, log)
-	layoutUpdater := updateLayout.NewUpdater(layoutRepo, log)
-	layoutDeleter := deleteLayout.NewDeleter(layoutRepo, log)
+	notifier := notificationCreate.NewNotifier(repo, layoutRepo, smtp.NewSender(cfg.SMTP, log), log, cfg.WorkerPool.Workers)
 
 	return &Container{
 		Config:              cfg,
 		Logger:              log,
 		DB:                  db,
-		NotificationCreator: createNotification.NewCreator(repo, notifier, log),
-		NotificationGetter:  getNotification.NewGetter(repo),
-		LayoutGetter:        layoutGetter,
-		LayoutLister:        layoutLister,
-		LayoutCreator:       layoutCreator,
-		LayoutUpdater:       layoutUpdater,
-		LayoutDeleter:       layoutDeleter,
+		NotificationCreator: notificationCreate.NewCreator(repo, notifier, log),
+		NotificationGetter:  notificationGet.NewGetter(repo),
+		LayoutGetter:        layoutGet.NewGetter(layoutRepo, log),
+		LayoutLister:        layoutList.NewLister(layoutRepo, log),
+		LayoutCreator:       layoutCreate.NewCreator(layoutRepo, log),
+		LayoutUpdater:       layoutUpdate.NewUpdater(layoutRepo, log),
+		LayoutDeleter:       layoutDelete.NewDeleter(layoutRepo, log),
+		MailProcessor:       mailprocessor.NewProcessIncomingEmail(imap.NewIMAPClient(cfg.IMAP, log)),
 	}, nil
 }
 

@@ -10,11 +10,11 @@ import (
 )
 
 type GetNotificationHandler struct {
-	getter *getUseCase.Getter
+	getter *getUseCase.NotificationGetter
 	logger logger.Logger
 }
 
-func NewGetNotificationHandler(getter *getUseCase.Getter, log logger.Logger) gin.HandlerFunc {
+func NewGetNotificationHandler(getter *getUseCase.NotificationGetter, log logger.Logger) gin.HandlerFunc {
 	handler := &GetNotificationHandler{
 		getter: getter,
 		logger: log,
@@ -37,7 +37,7 @@ func (h *GetNotificationHandler) GetNotification(c *gin.Context) {
 		return
 	}
 
-	response, err := h.getter.GetByID(c.Request.Context(), id)
+	response, err := h.getter.Execute(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

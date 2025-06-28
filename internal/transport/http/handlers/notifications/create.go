@@ -14,7 +14,7 @@ import (
 )
 
 type CreateNotificationHandler struct {
-	service       *createUseCase.Creator
+	service       *createUseCase.NotificationCreator
 	logger        logger.Logger
 	validate      *validator.Validate
 	uploadDir     string
@@ -22,7 +22,7 @@ type CreateNotificationHandler struct {
 }
 
 func NewCreateNotificationHandler(
-	creator *createUseCase.Creator,
+	creator *createUseCase.NotificationCreator,
 	log logger.Logger,
 	uploadDir string,
 	maxUploadSize int64,
@@ -76,7 +76,7 @@ func (h *CreateNotificationHandler) CreateNotification(c *gin.Context) {
 
 	h.getAttachments(&req, form, c)
 
-	response, err := h.service.CreateNotification(c.Request.Context(), req)
+	response, err := h.service.Execute(c.Request.Context(), req)
 	if err != nil {
 		h.logger.Error("Failed to create notification", "error", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

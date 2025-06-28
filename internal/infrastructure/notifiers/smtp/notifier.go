@@ -5,16 +5,17 @@ import (
 	"notification/config"
 	"notification/pkg/logger"
 	"os"
+	"strings"
 
 	"gopkg.in/gomail.v2"
 )
 
 type SMTPSender struct {
-	cfg    config.Config
+	cfg    config.SMTP
 	logger logger.Logger
 }
 
-func NewSender(cfg config.Config, logger logger.Logger) *SMTPSender {
+func NewSender(cfg config.SMTP, logger logger.Logger) *SMTPSender {
 	return &SMTPSender{
 		cfg:    cfg,
 		logger: logger,
@@ -24,10 +25,10 @@ func NewSender(cfg config.Config, logger logger.Logger) *SMTPSender {
 // Отправка сообщения по SMTP
 func (s *SMTPSender) Send(id string, to string, subject string, message string, attachments map[string]string) error {
 	d := gomail.NewDialer(
-		s.cfg.SMTP.Host,
-		s.cfg.SMTP.Port,
-		s.cfg.SMTP.Username,
-		s.cfg.SMTP.Password,
+		s.cfg.Host,
+		s.cfg.Port,
+		s.cfg.Username,
+		s.cfg.Password,
 	)
 
 	d.TLSConfig = &tls.Config{
@@ -48,16 +49,22 @@ func (s *SMTPSender) Send(id string, to string, subject string, message string, 
 	}
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", s.cfg.SMTP.From)
+	m.SetHeader("From", s.cfg.From)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", message)
 
-	m.SetHeader("Non-Delivery-Report", s.cfg.SMTP.Username)
-	// m.SetHeader("Disposition-Notification-To", s.cfg.SMTP.Username)
+	m.SetHeader("Non-Delivery-Report", s.cfg.Username)
+	// уведомление о прочтении
+	// m.SetHeader("Disposition-Notification-To", s.cfg.Username)
 	m.SetHeader("Message-Id", id)
 
-	// Добавление всех вложений
+	// Скрытая копия
+	if s.cfg.BCC != "" {
+		bcc := strings.Split(s.cfg.BCC, ",")
+		m.SetHeader("Bcc", bcc...)
+	}
+
 	for fileName, filePath := range attachments {
 		if _, err := os.Stat(filePath); os.IsNotExist(err) {
 			s.logger.Error("File not found, skipping", "path", filePath)

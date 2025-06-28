@@ -16,13 +16,13 @@ type Database struct {
 }
 
 // Cоздаем новое подключение к PostgreSQL
-func New(cfg config.Config) (*Database, error) {
+func New(cfg config.Database) (*Database, error) {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		cfg.Database.Host,
-		cfg.Database.Port,
-		cfg.Database.User,
-		cfg.Database.Password,
-		cfg.Database.Name,
+		cfg.Host,
+		cfg.Port,
+		cfg.User,
+		cfg.Password,
+		cfg.Name,
 	)
 
 	db, err := sqlx.Connect("pgx", dsn)
@@ -31,12 +31,12 @@ func New(cfg config.Config) (*Database, error) {
 	}
 
 	// Настройки пула соединений
-	db.SetMaxOpenConns(cfg.Database.MaxOpenConns)       // Максимум открытых соединений
-	db.SetMaxIdleConns(cfg.Database.MaxIdleConns)       // Максимум бездействующих соединений
-	db.SetConnMaxLifetime(cfg.Database.ConnMaxLifetime) // Максимальное время жизни соединения
+	db.SetMaxOpenConns(cfg.MaxOpenConns)       // Максимум открытых соединений
+	db.SetMaxIdleConns(cfg.MaxIdleConns)       // Максимум бездействующих соединений
+	db.SetConnMaxLifetime(cfg.ConnMaxLifetime) // Максимальное время жизни соединения
 
 	// Проверка подключения
-	ctx, cancel := context.WithTimeout(context.Background(), cfg.Database.ConnectTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.ConnectTimeout)
 	defer cancel()
 
 	if err := db.PingContext(ctx); err != nil {

@@ -76,7 +76,7 @@ migrate -path migrations -database "postgres://php2go:php2go@localhost:5432/noti
 ```
 
 
-**SWAGGER**:
+### Swagger
 - github.com/swaggo/gin-swagger
 
 Генерация yaml 
@@ -85,6 +85,15 @@ swag init -g cmd/notification-server/main.go --output docs  --parseDependency --
 ```
 
 http://localhost:8080/swagger/index.html
+
+
+### Linter
+
+https://golangci-lint.run/
+
+```
+golangci-lint run 
+```
 
 ### VsCode run launch
 .vscode\launch.json с поддержкой `.env`

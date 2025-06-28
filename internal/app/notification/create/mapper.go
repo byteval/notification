@@ -42,27 +42,3 @@ func ToDomain(r Request) (*notification.Notification, error) {
 
 	return n, nil
 }
-
-// ToResponse конвертирует доменную модель в Response
-func ToResponse(n *notification.Notification) *Response {
-	response := &Response{
-		ID:        n.ID,
-		CreatedAt: n.CreatedAt,
-	}
-
-	for _, receiver := range n.NotificationReceivers {
-		response.Receivers = append(response.Receivers, ReceiverResponse{
-			Email:  receiver.Email,
-			Status: string(receiver.Status),
-		})
-	}
-
-	for _, attachment := range n.Attachments {
-		response.Attachments = append(response.Attachments, AttachmentResponse{
-			FileName: attachment.FileName,
-			Size:     attachment.Size,
-		})
-	}
-
-	return response
-}
