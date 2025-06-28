@@ -292,7 +292,7 @@
             "post": {
                 "description": "Создает новое уведомление",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -303,13 +303,45 @@
                 "summary": "Создание уведомления",
                 "parameters": [
                     {
-                        "description": "Данные уведомления",
-                        "name": "input",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/notification_internal_app_notification_create.Request"
-                        }
+                        "type": "string",
+                        "description": "ID шаблона (UUID)",
+                        "name": "layout_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Заголовок уведомления",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Дополнительные данные (JSON строка)",
+                        "name": "data",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "description": "Список email получателей",
+                        "name": "receiver",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "file"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Файлы вложений",
+                        "name": "attachments",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -547,35 +579,6 @@
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "notification_internal_app_notification_create.Request": {
-            "description": "Модель запроса для создания уведомления",
-            "type": "object",
-            "required": [
-                "layout_id",
-                "receiver",
-                "title"
-            ],
-            "properties": {
-                "data": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "layout_id": {
-                    "description": "@Schema(example=\"a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\", format=\"uuid\", description=\"ID шаблона\")",
-                    "type": "string"
-                },
-                "receiver": {
-                    "description": "@Schema(example=\"[test@php2go.com]\", format=\"array\", description=\"Email получателя\")",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
                     "type": "string"
                 }
             }

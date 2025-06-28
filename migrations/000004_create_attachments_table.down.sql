@@ -1,0 +1,2 @@
+DROP INDEX IF EXISTS idx_notification_attachments_notification_id;
+DROP TABLE IF EXISTS notification_attachments;

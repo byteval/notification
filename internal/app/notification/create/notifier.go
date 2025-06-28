@@ -69,7 +69,7 @@ func (s *Notifier) SendNotificationAsync(n *notification.Notification) {
 				return
 			}
 
-			sendErr := s.smtpSender.Send(nr.Email, title, content)
+			sendErr := s.smtpSender.Send(nr.ID, nr.Email, title, content, s.getAttachments(n))
 			if sendErr == nil {
 				s.updateStatus(ctx, nr, notification.StatusSent)
 				return
@@ -78,6 +78,16 @@ func (s *Notifier) SendNotificationAsync(n *notification.Notification) {
 			s.logFailed(ctx, sendErr, nr)
 		})
 	}
+}
+
+func (s *Notifier) getAttachments(n *notification.Notification) map[string]string {
+	resultMap := make(map[string]string, len(n.Attachments))
+
+	for _, attachment := range n.Attachments {
+		resultMap[attachment.FileName] = attachment.FilePath
+	}
+
+	return resultMap
 }
 
 // Логирование ошибок

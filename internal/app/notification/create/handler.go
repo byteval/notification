@@ -29,7 +29,7 @@ func NewCreator(
 func (s *Creator) CreateNotification(ctx context.Context, req Request) (*Response, error) {
 	req = *s.checkUniqueReceiver(&req)
 
-	n, receivers, err := ToDomain(req)
+	n, err := ToDomain(req)
 	if err != nil {
 		s.logger.Error("Failed to convert request to domain", "error", err)
 		return nil, fmt.Errorf("failed to convert request to domain: %w", err)
@@ -37,7 +37,7 @@ func (s *Creator) CreateNotification(ctx context.Context, req Request) (*Respons
 
 	n.CreatedAt = time.Now()
 
-	created, err := s.repo.CreateWithReceivers(ctx, n, receivers)
+	created, err := s.repo.Create(ctx, n)
 
 	if err != nil {
 		s.logger.Error("Failed to save notification", "error", err)

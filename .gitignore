@@ -7,3 +7,4 @@ vendor.cp/
 .env
 .gitconfig
 cmd/notification-server/*.exe
+cmd/notification-server/upload/

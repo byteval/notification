@@ -131,29 +131,6 @@ definitions:
       status:
         type: string
     type: object
-  notification_internal_app_notification_create.Request:
-    description: Модель запроса для создания уведомления
-    properties:
-      data:
-        additionalProperties: true
-        type: object
-      layout_id:
-        description: '@Schema(example="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", format="uuid",
-          description="ID шаблона")'
-        type: string
-      receiver:
-        description: '@Schema(example="[test@php2go.com]", format="array", description="Email
-          получателя")'
-        items:
-          type: string
-        type: array
-      title:
-        type: string
-    required:
-    - layout_id
-    - receiver
-    - title
-    type: object
   notification_internal_app_notification_create.Response:
     description: Стандартный ответ API
     properties:
@@ -371,15 +348,38 @@ paths:
   /notifications:
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Создает новое уведомление
       parameters:
-      - description: Данные уведомления
-        in: body
-        name: input
+      - description: ID шаблона (UUID)
+        in: formData
+        name: layout_id
         required: true
-        schema:
-          $ref: '#/definitions/notification_internal_app_notification_create.Request'
+        type: string
+      - description: Заголовок уведомления
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Дополнительные данные (JSON строка)
+        in: formData
+        name: data
+        type: string
+      - collectionFormat: multi
+        description: Список email получателей
+        in: formData
+        items:
+          type: string
+        name: receiver
+        required: true
+        type: array
+      - collectionFormat: csv
+        description: Файлы вложений
+        in: formData
+        items:
+          type: file
+        name: attachments
+        type: array
       produces:
       - application/json
       responses:

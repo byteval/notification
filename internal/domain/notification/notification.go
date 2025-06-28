@@ -12,6 +12,7 @@ type Notification struct {
 	Title                 string                 `json:"title" db:"title"`
 	Data                  JSONB                  `json:"data" db:"data"`
 	NotificationReceivers []NotificationReceiver `json:"emails" db:"-"`
+	Attachments           []Attachment           `json:"attachments" db:"-"`
 	CreatedAt             time.Time              `json:"created_at" db:"created_at"`
 }
 

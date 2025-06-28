@@ -35,7 +35,15 @@ func SetupRouter(ctn *container.Container) *gin.Engine {
 		// Группа уведомлений
 		notificationsGroup := apiV1.Group("/notifications")
 		{
-			notificationsGroup.POST("", handlers.NewCreateNotificationHandler(ctn.NotificationCreator, ctn.Logger))
+			notificationsGroup.POST(
+				"",
+				handlers.NewCreateNotificationHandler(
+					ctn.NotificationCreator,
+					ctn.Logger,
+					ctn.Config.HTTP.UploadDir,
+					ctn.Config.HTTP.MaxUploadSize,
+				),
+			)
 			notificationsGroup.GET("/:id", handlers.NewGetNotificationHandler(ctn.NotificationGetter, ctn.Logger))
 		}
 

@@ -6,7 +6,7 @@ import (
 )
 
 // ToDomain конвертирует Request в доменную модель Notification и список ReceiverEmail
-func ToDomain(r Request) (*notification.Notification, []notification.NotificationReceiver, error) {
+func ToDomain(r Request) (*notification.Notification, error) {
 	// Создаем основное уведомление
 	n := &notification.Notification{
 		LayoutID:  r.LayoutID,
@@ -24,7 +24,23 @@ func ToDomain(r Request) (*notification.Notification, []notification.Notificatio
 		})
 	}
 
-	return n, receivers, nil
+	n.NotificationReceivers = receivers
+
+	// Создаем вложения
+	var attachments []notification.Attachment
+	for _, attachment := range r.Attachments {
+		attachments = append(attachments, notification.Attachment{
+			FileName:     attachment.Filename,
+			OriginalName: attachment.Filename,
+			ContentType:  attachment.ContentType,
+			Size:         attachment.Size,
+			FilePath:     attachment.FilePath,
+		})
+	}
+
+	n.Attachments = attachments
+
+	return n, nil
 }
 
 // ToResponse конвертирует доменную модель в Response
@@ -34,11 +50,17 @@ func ToResponse(n *notification.Notification) *Response {
 		CreatedAt: n.CreatedAt,
 	}
 
-	// Добавляем информацию о получателях
 	for _, receiver := range n.NotificationReceivers {
 		response.Receivers = append(response.Receivers, ReceiverResponse{
 			Email:  receiver.Email,
 			Status: string(receiver.Status),
+		})
+	}
+
+	for _, attachment := range n.Attachments {
+		response.Attachments = append(response.Attachments, AttachmentResponse{
+			FileName: attachment.FileName,
+			Size:     attachment.Size,
 		})
 	}
 

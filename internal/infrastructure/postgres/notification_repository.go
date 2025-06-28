@@ -18,35 +18,6 @@ func NewNotificationRepository(db *sqlx.DB) *NotificationRepository {
 }
 
 func (r *NotificationRepository) Create(ctx context.Context, n *notification.Notification) (*notification.Notification, error) {
-	query := `
-        INSERT INTO notifications (
-            layout_id, status, title, content, data, channels, receiver
-        ) VALUES (
-            :layout_id, :status, :title, :content, :data, :channels, :receiver
-        ) RETURNING id`
-
-	rows, err := r.db.NamedQueryContext(ctx, query, n)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create notification: %w", err)
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		return nil, fmt.Errorf("no rows returned after insert")
-	}
-
-	if err := rows.StructScan(n); err != nil {
-		return nil, fmt.Errorf("failed to scan created notification: %w", err)
-	}
-
-	return n, nil
-}
-
-func (r *NotificationRepository) CreateWithReceivers(
-	ctx context.Context,
-	n *notification.Notification,
-	receivers []notification.NotificationReceiver,
-) (*notification.Notification, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -63,19 +34,42 @@ func (r *NotificationRepository) CreateWithReceivers(
 		return nil, err
 	}
 
-	// Создаем получателей
-	for i := range receivers {
-		receivers[i].NotificationID = n.ID
+	// 2. Сохраняем получателей
+	for i := range n.NotificationReceivers {
+		receiver := &n.NotificationReceivers[i]
+		receiver.NotificationID = n.ID // Устанавливаем связь
+
 		err = tx.QueryRowContext(ctx,
 			`INSERT INTO notification_receivers 
-			 (notification_id, email, status)
-			 VALUES ($1, $2, $3) RETURNING id`,
-			receivers[i].NotificationID,
-			receivers[i].Email,
-			receivers[i].Status,
-		).Scan(&receivers[i].ID)
+             (notification_id, email, status)
+             VALUES ($1, $2, $3) RETURNING id`,
+			receiver.NotificationID,
+			receiver.Email,
+			receiver.Status,
+		).Scan(&receiver.ID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to create receiver: %w", err)
+		}
+	}
+
+	// 3. Сохраняем вложения
+	for i := range n.Attachments {
+		attachment := &n.Attachments[i]
+		attachment.NotificationID = n.ID // Устанавливаем связь
+
+		err = tx.QueryRowContext(ctx,
+			`INSERT INTO notification_attachments 
+             (notification_id, file_name, original_name, content_type, size, file_path)
+             VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, created_at`,
+			attachment.NotificationID,
+			attachment.FileName,
+			attachment.OriginalName,
+			attachment.ContentType,
+			attachment.Size,
+			attachment.FilePath,
+		).Scan(&attachment.ID, &attachment.CreatedAt)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create attachment: %w", err)
 		}
 	}
 
@@ -83,7 +77,6 @@ func (r *NotificationRepository) CreateWithReceivers(
 		return nil, err
 	}
 
-	n.NotificationReceivers = receivers
 	return n, nil
 }
 

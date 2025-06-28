@@ -1,11 +1,14 @@
 ## Сервис уведомлений (notification)
 
-Используются:
-- github.com/caarlos0/env/v9
-- github.com/gin-gonic/gin
-- github.com/jackc/pgx/v5
-- github.com/lib/pq
-- github.com/jmoiron/sqlx
+Основные функции:
+
+1. REST API - управление шаблонами и уведомлениями.
+
+2. Отправка сообщений на электронную почту (SMTP).
+
+3. Обработка входящей почты (IMAP).
+
+4. Возврат обработанных ответов исходным клиентам по вебхуку.
 
 ### Структура проекта
 ```
@@ -14,9 +17,9 @@ notification/
 ├── config/                             # Конфигурация
 ├── docs/                               # Swagger
 ├── migrations/                         # Миграции
-├── internal/
+├── internal/                           
 │    ├── app/                           # Операции / Use Cases
-│    │   └── notification/              # Уведомления
+│    │   └── notification/              # Контекст - Уведомления
 │    │       └── create/                # Создание уведомления
 │    │           ├── handler.go         # Хэндлер операции
 │    │           ├── mapper.go          # Маппинг ToDomain/ToResponse
@@ -24,7 +27,7 @@ notification/
 │    ├── container/            
 │    │   └── container.go               # Контейнер DI
 │    ├── domain/                        # Domain: Сущности, Интерфейсы сервисов, Бизнес-правила
-│    │   └── notification/              
+│    │   └── notification/              # Контекст - Уведомления
 │    │         ├── notification.go      # Модель (Notification)
 │    │         └── ports/               # Интерфейсы сервисов
 │    │             └── repository.go    # Интерфейс репозитория Notification
@@ -42,9 +45,16 @@ notification/
 │        └── postgres/
 │            ├── database.go            # Подключение к СУБД POSTGRES
 │            └── notification_repository.go
-├── test/ 
+└── test/ 
 ```
 [Полное описание структуры проекта](./structure.md)
+
+### Используются:
+- github.com/caarlos0/env/v9
+- github.com/gin-gonic/gin
+- github.com/jackc/pgx/v5
+- github.com/lib/pq
+- github.com/jmoiron/sqlx
 
 
 ### Миграции - golang-migrate
@@ -77,7 +87,7 @@ swag init -g cmd/notification-server/main.go --output docs  --parseDependency --
 http://localhost:8080/swagger/index.html
 
 ### VsCode run launch
-.vscode\launch.json
+.vscode\launch.json с поддержкой `.env`
 ```
 {
 	"version": "0.2.0",

@@ -1,4 +1,3 @@
--- Create notification_receivers table
 CREATE TABLE notification_receivers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     notification_id UUID NOT NULL,
@@ -15,7 +14,6 @@ CREATE TABLE notification_receivers (
         ON DELETE CASCADE
 );
 
--- Create indexes
 CREATE INDEX idx_notification_receivers_notification_id ON notification_receivers(notification_id);
 CREATE INDEX idx_notification_receivers_status ON notification_receivers(status);
 CREATE INDEX idx_notification_receivers_email ON notification_receivers(email);

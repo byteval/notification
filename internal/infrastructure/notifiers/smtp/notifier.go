@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"notification/config"
 	"notification/pkg/logger"
+	"os"
 
 	"gopkg.in/gomail.v2"
 )
@@ -21,7 +22,7 @@ func NewSender(cfg config.Config, logger logger.Logger) *SMTPSender {
 }
 
 // Отправка сообщения по SMTP
-func (s *SMTPSender) Send(to string, subject string, message string) error {
+func (s *SMTPSender) Send(id string, to string, subject string, message string, attachments map[string]string) error {
 	d := gomail.NewDialer(
 		s.cfg.SMTP.Host,
 		s.cfg.SMTP.Port,
@@ -54,10 +55,17 @@ func (s *SMTPSender) Send(to string, subject string, message string) error {
 
 	m.SetHeader("Non-Delivery-Report", s.cfg.SMTP.Username)
 	// m.SetHeader("Disposition-Notification-To", s.cfg.SMTP.Username)
-	//m.SetHeader("Message-Id", strconv.FormatInt(ID, 10))
+	m.SetHeader("Message-Id", id)
 
-	// Добавление вложения:
-	// m.Attach("/path/to/file.pdf")
+	// Добавление всех вложений
+	for fileName, filePath := range attachments {
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			s.logger.Error("File not found, skipping", "path", filePath)
+			continue
+		}
+
+		m.Attach(filePath, gomail.Rename(fileName))
+	}
 
 	// Встроенные изображения
 	// m.Embed("/tmp/image.png")

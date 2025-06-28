@@ -9,9 +9,11 @@ import (
 
 type Config struct {
 	HTTP struct {
-		Port         int           `env:"HTTP_PORT" envDefault:"8080"`
-		ReadTimeout  time.Duration `env:"SERVER_READ_TIMEOUT" envDefault:"15s"`
-		WriteTimeout time.Duration `env:"SERVER_WRITE_TIMEOUT" envDefault:"15s"`
+		Port          int           `env:"HTTP_PORT" envDefault:"8080"`
+		ReadTimeout   time.Duration `env:"SERVER_READ_TIMEOUT" envDefault:"15s"`
+		WriteTimeout  time.Duration `env:"SERVER_WRITE_TIMEOUT" envDefault:"15s"`
+		UploadDir     string        `env:"UPLOAD_DIR" envDefault:"upload"`
+		MaxUploadSize int64         `env:"MAX_UPLOAD_SIZE" envDefault:"10485760"`
 	}
 
 	WorkerPool struct {
