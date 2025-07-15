@@ -6,7 +6,7 @@ type Request struct {
 	LayoutID    string                 `form:"layout_id" validate:"required,uuid4" example:"5471ced2-46ce-4a9f-955e-363b3b11db87"`
 	Title       string                 `form:"title" validate:"required"`
 	Data        map[string]interface{} `form:"data"` // JSON-массив
-	Emails      []string               `form:"receiver" validate:"required,dive,email" example:"[\"mail@example.com\"]"`
+	Emails      []string               `form:"receiver" validate:"required,min=1,dive,email" example:"[\"mail@example.com\"]"`
 	Attachments []Attachment           `form:"-" swaggerignore:"true"`
 }
 

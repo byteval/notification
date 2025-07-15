@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CreateLayoutHandler обработчик для создания шаблона
+// NewCreateLayoutHandler обработчик для создания шаблона
 // @Summary Создать новый шаблон уведомления
 // @Description Создает новый шаблон уведомления
 // @Tags Layouts
